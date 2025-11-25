@@ -2,7 +2,7 @@ import asyncio
 import logging
 import sys
 
-from dispatcher import bot, dp
+from bot.dispatcher import bot, dp
 from bot.handlers import router
 
 async def main():

@@ -1,0 +1,12 @@
+.git
+.gitignore
+.idea
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.local
+*.log
+.DS_Store
+Thumbs.db
