@@ -1,5 +1,4 @@
-from aiogram.utils.keyboard import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils.keyboard import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
-send_number = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='📲 Поширити номер телефону', request_contact=True)],
-])
+delete_form_button = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text='Я не заповнював анкету/видалити анкету',
+                                                                callback_data='delete_form')]])
