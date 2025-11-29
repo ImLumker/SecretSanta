@@ -1,1 +1,1 @@
-from .users import get_userid_gives_gift_to, get_all_users, find_user, save_users, delete_user
+from .users import get_info_about_gives_gift_to, get_all_users, find_user, save_users, delete_user
