@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery, ReplyKeyboardRemove
 from random import randint, shuffle, random, sample
 
 from ..fsm import CreateUser
-from ..keyboard import delete_form_button, start_game_admin_button, confirm_starting_game, confirm_finishing_game
+from ..keyboard import delete_form_button, admin_panel_buttons, confirm_starting_game, confirm_finishing_game
 from ..dispatcher import bot, admins
 from ..models import get_info_about_gives_gift_to, get_all_users, find_user, delete_user, save_users, users
 from ..filters.admin_filter import admin_only
@@ -63,7 +63,7 @@ async def create_user_suggestion(message: types.Message, state: FSMContext):
 @router.message(Command("admin"))
 @admin_only
 async def admin(message: types.Message):
-    await message.answer(text="Доступ надано", reply_markup=start_game_admin_button)
+    await message.answer(text="Доступ надано", reply_markup=admin_panel_buttons)
 
 
 @router.message(lambda message: message.text == "Розпочати гру")
@@ -88,6 +88,25 @@ async def finish_game(message: types.Message):
                              reply_markup=confirm_finishing_game)
     else:
         await message.answer(text="Гра не триває!", reply_markup=ReplyKeyboardRemove())
+
+@router.message(lambda message: message.text == "Список учасників")
+@admin_only
+async def members_list(message: types.Message):
+    all_users = get_all_users(True)
+    text = f"Активність гри: {all_users[0]["is_game_active"]}\n"
+    len_users = 0
+    for user in all_users[1:]:
+        len_users += 1
+        text += (f"\nУчасник №{len_users}\n"
+                 f"ID: {user['user_id']}\n"
+                 f"Ім'я користувача: {user['username']}\n"
+                 f"Зареєстроване ім'я: {user['full_name']}\n"
+                 f"Дарує: {user['gives_gift_to']}\n"
+                 f"Отримує від: {user['receives_gift_from']}\n"
+                 f"Побажання: {user['suggestion']}\n")
+
+    await message.answer(text=text, reply_markup=ReplyKeyboardRemove())
+
 
 """ Callback (InlineKeyboardButtons) """
 
@@ -156,7 +175,10 @@ async def confirm_finishing_callback(callback: CallbackQuery):
     for user in all_users[1:]:
         user['gives_gift_to'] = None
         user['receives_gift_from'] = None
-        await bot.send_message(chat_id=user["user_id"], text="Гра була примусово завершена!")
+        try:
+            await bot.send_message(chat_id=user["user_id"], text="Гра була примусово завершена!")
+        except Exception as error:
+            await bot.send_message(chat_id=admins[0], text=f"{error}\n{user['user_id']}")
     await callback.message.delete()
     save_users(all_users)
     return await callback.answer(text="✅ Успішно", show_alert=True)
